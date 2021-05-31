@@ -24,7 +24,7 @@ public class StringUtil {
         // 生成UUID
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
         // 生成上传至云服务器的路径
-        String path = System.nanoTime() + "-" + uuid + suffix;
+        String path = TimeUtil.getNow() + "-" + uuid + suffix;
         return path;
     }
 }

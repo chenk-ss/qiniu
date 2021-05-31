@@ -3,6 +3,7 @@ package com.chenk.qiniu.controller;
 import com.chenk.qiniu.pojo.FileDTO;
 import com.chenk.qiniu.service.QiNiuService;
 import com.chenk.qiniu.util.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,7 @@ import java.util.List;
 @RequestMapping("file")
 public class FileController {
 
-    @Resource
+    @Autowired
     private QiNiuService qiNiuService;
 
     @GetMapping("query/list")
@@ -29,7 +30,7 @@ public class FileController {
 
 
     @PostMapping(value = "/upload")
-    private String upLoadImage(@RequestParam("file") MultipartFile file) throws IOException {
+    private String upload(@RequestParam("file") MultipartFile file) throws IOException {
         // 获取文件的名称
         String fileName = file.getOriginalFilename();
         // 使用工具类根据上传文件生成唯一文件名称

@@ -3,6 +3,7 @@ package com.chenk.qiniu.service.impl;
 import com.chenk.qiniu.config.CloudStorageConfig;
 import com.chenk.qiniu.pojo.FileDTO;
 import com.chenk.qiniu.service.QiNiuService;
+import com.chenk.qiniu.util.TimeUtil;
 import com.google.gson.Gson;
 import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
@@ -75,7 +76,6 @@ public class QiNiuServiceImpl implements QiNiuService {
         int limit = 10;
         //指定目录分隔符，列出所有公共前缀（模拟列出目录效果）。缺省值为空字符串
         String delimiter = "";
-
         List<FileDTO> result = new ArrayList<>();
         //列举空间文件列表
         BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(config.getBucketName(), prefix, limit, delimiter);
@@ -89,7 +89,7 @@ public class QiNiuServiceImpl implements QiNiuService {
                 fileDTO.setEndUser(item.endUser);
                 fileDTO.setKey(item.key);
                 fileDTO.setMimeType(item.mimeType);
-                fileDTO.setPutTime(item.putTime);
+                fileDTO.setPutTime(TimeUtil.secondToDate(item.putTime / 10000, "yyyy-MM-dd HH:mm:ss"));
                 fileDTO.setUrl(config.getDomain() + "/" + item.key);
                 result.add(fileDTO);
             }
