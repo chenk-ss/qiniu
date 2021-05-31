@@ -24,8 +24,6 @@ public class FileController {
 
     @Autowired
     private QiNiuService qiNiuService;
-    @Autowired
-    private FileRepository fileRepository;
 
     @GetMapping("query/list")
     public List<FileDTO> queryList() {
@@ -42,17 +40,6 @@ public class FileController {
         if (!file.isEmpty()) {
             FileInputStream inputStream = (FileInputStream) file.getInputStream();
             String path = qiNiuService.uploadQN(inputStream, imgName);
-            FileBean fileBean = new FileBean();
-            fileBean.setFileName(fileName);
-            fileBean.setUrl(path);
-            Date date = new Date();
-            fileBean.setCreateTime(date);
-            fileBean.setUpdateTime(date);
-            fileBean.setSize(file.getSize());
-            fileBean.setType(null);
-            fileBean.setStatus(1L);
-            fileBean.setRemark(null);
-            fileRepository.save(fileBean);
             System.out.print("七牛云返回的链接:" + path);
             return path;
         }

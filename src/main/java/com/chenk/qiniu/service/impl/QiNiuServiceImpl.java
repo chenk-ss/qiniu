@@ -2,6 +2,8 @@ package com.chenk.qiniu.service.impl;
 
 import com.chenk.qiniu.config.CloudStorageConfig;
 import com.chenk.qiniu.pojo.FileDTO;
+import com.chenk.qiniu.pojo.bean.FileBean;
+import com.chenk.qiniu.repository.FileRepository;
 import com.chenk.qiniu.service.QiNiuService;
 import com.chenk.qiniu.util.TimeUtil;
 import com.google.gson.Gson;
@@ -14,10 +16,12 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +30,9 @@ import java.util.List;
  */
 @Service
 public class QiNiuServiceImpl implements QiNiuService {
+
+    @Autowired
+    private FileRepository fileRepository;
 
     private CloudStorageConfig config;
     // 七牛文件上传管理器
@@ -59,14 +66,32 @@ public class QiNiuServiceImpl implements QiNiuService {
             }
             // 解析上传成功的结果
             DefaultPutRet putRet = new Gson().fromJson(res.bodyString(), DefaultPutRet.class);
+            // 添加到MySQL
+            {
+                FileInfo fileInfo = queryByKey(putRet.key);
+                FileBean fileBean = new FileBean();
+                fileBean.setFileName(key);
+                fileBean.setUrl(config.getDomain() + "/" + putRet.key);
+                Date date = new Date();
+                fileBean.setCreateTime(date);
+                fileBean.setUpdateTime(date);
+                fileBean.setSize(fileInfo.fsize);
+                fileBean.setType(fileInfo.mimeType);
+                fileBean.setStatus(1L);
+                fileBean.setRemark(null);
+                fileRepository.save(fileBean);
+            }
 
             String path = config.getDomain() + "/" + putRet.key;
-            // 这个returnPath是获得到的外链地址,通过这个地址可以直接打开
             return path;
         } catch (QiniuException e) {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public FileInfo queryByKey(String key) throws QiniuException {
+        return bucketManager.stat(config.getBucketName(), key);
     }
 
     public List<FileDTO> list() {
