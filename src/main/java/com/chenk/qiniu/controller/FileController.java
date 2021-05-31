@@ -1,15 +1,17 @@
 package com.chenk.qiniu.controller;
 
 import com.chenk.qiniu.pojo.FileDTO;
+import com.chenk.qiniu.pojo.bean.FileBean;
+import com.chenk.qiniu.repository.FileRepository;
 import com.chenk.qiniu.service.QiNiuService;
 import com.chenk.qiniu.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +24,8 @@ public class FileController {
 
     @Autowired
     private QiNiuService qiNiuService;
+    @Autowired
+    private FileRepository fileRepository;
 
     @GetMapping("query/list")
     public List<FileDTO> queryList() {
@@ -38,6 +42,17 @@ public class FileController {
         if (!file.isEmpty()) {
             FileInputStream inputStream = (FileInputStream) file.getInputStream();
             String path = qiNiuService.uploadQN(inputStream, imgName);
+            FileBean fileBean = new FileBean();
+            fileBean.setFileName(fileName);
+            fileBean.setUrl(path);
+            Date date = new Date();
+            fileBean.setCreateTime(date);
+            fileBean.setUpdateTime(date);
+            fileBean.setSize(file.getSize());
+            fileBean.setType(null);
+            fileBean.setStatus(1L);
+            fileBean.setRemark(null);
+            fileRepository.save(fileBean);
             System.out.print("七牛云返回的链接:" + path);
             return path;
         }
