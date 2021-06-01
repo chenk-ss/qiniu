@@ -1,6 +1,7 @@
 package com.chenk.qiniu.service.impl;
 
 import com.chenk.qiniu.config.CloudStorageConfig;
+import com.chenk.qiniu.pojo.FileDBDTO;
 import com.chenk.qiniu.pojo.FileDTO;
 import com.chenk.qiniu.pojo.bean.FileBean;
 import com.chenk.qiniu.repository.FileRepository;
@@ -17,6 +18,10 @@ import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -120,5 +125,26 @@ public class QiNiuServiceImpl implements QiNiuService {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<FileDBDTO> listFromDB() {
+        Pageable page = PageRequest.of(0, 20, Sort.by("createTime").descending());
+        Page<FileBean> fileBeans = fileRepository.findAll(page);
+        List<FileDBDTO> fileDTOList = new ArrayList<>();
+        fileBeans.stream().forEach(fileBean -> {
+            FileDBDTO fileDTO = new FileDBDTO();
+            fileDTO.setId(fileBean.getId());
+            fileDTO.setFileName(fileBean.getFileName());
+            fileDTO.setUrl(fileBean.getUrl());
+            fileDTO.setCreateTime(TimeUtil.dateToStr(fileBean.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+            fileDTO.setUpdateTime(TimeUtil.dateToStr(fileBean.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
+            fileDTO.setSize(fileBean.getSize());
+            fileDTO.setType(fileBean.getType());
+            fileDTO.setStatus(fileBean.getStatus());
+            fileDTO.setRemark(fileBean.getRemark());
+            fileDTOList.add(fileDTO);
+        });
+        return fileDTOList;
     }
 }

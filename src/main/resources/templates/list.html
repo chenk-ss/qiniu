@@ -9,8 +9,9 @@
 <body>
 <table>
   <tr th:each="entity:${resultList}">
-      <p th:text="${entity.getPutTime()}"></p>
+      <p th:text="${entity.getCreateTime()}"></p>
       <p th:text="${entity.getUrl()}"></p>
+      <img th:src="${entity.getUrl()}" width="20%" height="20%"/>
   </tr>
 </table>
 <script>

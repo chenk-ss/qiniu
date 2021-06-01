@@ -26,7 +26,7 @@ public class HomeController {
 
     @GetMapping("/list")
     public String queryList(Model m) {
-        m.addAttribute("resultList", qiNiuService.list());
+        m.addAttribute("resultList", qiNiuService.listFromDB());
         return "list";
     }
 }

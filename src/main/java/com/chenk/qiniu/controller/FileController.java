@@ -1,8 +1,6 @@
 package com.chenk.qiniu.controller;
 
 import com.chenk.qiniu.pojo.FileDTO;
-import com.chenk.qiniu.pojo.bean.FileBean;
-import com.chenk.qiniu.repository.FileRepository;
 import com.chenk.qiniu.service.QiNiuService;
 import com.chenk.qiniu.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
