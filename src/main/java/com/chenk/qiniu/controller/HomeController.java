@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author: chenke
@@ -25,8 +26,9 @@ public class HomeController {
     }
 
     @GetMapping("/list")
-    public String queryList(Model m) {
-        m.addAttribute("resultList", qiNiuService.listFromDB());
+    public String queryList(Model m, @RequestParam("page") int page, @RequestParam("size") int size) {
+        size = size == 0 ? 20 : size;
+        m.addAttribute("resultList", qiNiuService.listFromDB(page, size));
         return "list";
     }
 }

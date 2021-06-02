@@ -54,11 +54,12 @@ public class QiNiuServiceImpl implements QiNiuService {
 
     private void init() {
         // 构造一个带指定Zone对象的配置类, 注意这里的Zone.zone0需要根据主机选择
-        uploadManager = new UploadManager(new Configuration(Zone.zone0()));
+        Zone zone = Zone.zone0();
+        uploadManager = new UploadManager(new Configuration(zone));
         auth = Auth.create(config.getACCESS_KEY(), config.getSECRET_KEY());
         // 根据命名空间生成的上传token
-        token = auth.uploadToken(config.getBucketName());
-        bucketManager = new BucketManager(auth, new Configuration(Zone.zone0()));
+        token = auth.uploadToken(config.getBucketName(), null, 60 * 60 * 24 * 30, null, true);
+        bucketManager = new BucketManager(auth, new Configuration(zone));
     }
 
     @Override
@@ -128,8 +129,8 @@ public class QiNiuServiceImpl implements QiNiuService {
     }
 
     @Override
-    public List<FileDBDTO> listFromDB() {
-        Pageable page = PageRequest.of(0, 20, Sort.by("createTime").descending());
+    public List<FileDBDTO> listFromDB(int pageNum, int size) {
+        Pageable page = PageRequest.of(pageNum, size, Sort.by("createTime").descending());
         Page<FileBean> fileBeans = fileRepository.findAll(page);
         List<FileDBDTO> fileDTOList = new ArrayList<>();
         fileBeans.stream().forEach(fileBean -> {

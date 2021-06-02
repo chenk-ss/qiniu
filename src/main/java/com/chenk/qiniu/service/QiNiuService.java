@@ -14,10 +14,18 @@ public interface QiNiuService {
     String uploadQN(FileInputStream file, String path);
 
     /**
-     *  通过查询七牛云查询列表
+     * 通过查询七牛云查询列表
+     *
      * @return
      */
     List<FileDTO> list();
 
-    List<FileDBDTO> listFromDB();
+    /**
+     * 从数据库查询文件列表
+     *
+     * @param pageNum
+     * @param size
+     * @return
+     */
+    List<FileDBDTO> listFromDB(int pageNum, int size);
 }
