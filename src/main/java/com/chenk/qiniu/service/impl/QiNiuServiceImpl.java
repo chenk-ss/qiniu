@@ -17,11 +17,13 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -34,6 +36,7 @@ import java.util.List;
  * @since: 2021/5/31
  */
 @Service
+@Slf4j
 public class QiNiuServiceImpl implements QiNiuService {
 
     @Autowired
@@ -57,9 +60,15 @@ public class QiNiuServiceImpl implements QiNiuService {
         Zone zone = Zone.zone0();
         uploadManager = new UploadManager(new Configuration(zone));
         auth = Auth.create(config.getACCESS_KEY(), config.getSECRET_KEY());
-        // 根据命名空间生成的上传token
-        token = auth.uploadToken(config.getBucketName(), null, 60 * 60 * 24 * 30, null, true);
         bucketManager = new BucketManager(auth, new Configuration(zone));
+    }
+
+    // 生成上传token 周期:1天
+    @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
+    private void configureTasks() {
+        log.info("--------------开始续签token--------------");
+        token = auth.uploadToken(config.getBucketName(), null, 60L * 60 * 24, null, true);
+        log.info("--------------结束续签token--------------");
     }
 
     @Override
